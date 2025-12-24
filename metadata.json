@@ -1,0 +1,5 @@
+{
+  "name": "Nexus AI Hub",
+  "description": "A centralized intelligence hub that routes user intent to specific AI tools (Image Generation, Chat, Analysis) using a Master Agent architecture.",
+  "requestFramePermissions": []
+}
