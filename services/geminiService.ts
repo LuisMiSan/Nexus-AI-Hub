@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { AppMode, ImageResolution, RouterResponse } from "../types";
 
@@ -18,6 +19,7 @@ export const routeUserIntent = async (userInput: string): Promise<RouterResponse
         1. IMAGE: For generating, creating, or designing images, photos, drawings, or art.
         2. CHAT: For general knowledge questions, coding help, advice, or conversation.
         3. EMAIL: For drafting, editing, or formatting emails.
+        4. WORKFLOWS: If the user mentions "process", "pipeline", "sequence", "automation", or "connect tools".
         
         Rules:
         - If the user explicitly asks to generate an image, choose IMAGE.
@@ -32,7 +34,7 @@ export const routeUserIntent = async (userInput: string): Promise<RouterResponse
           properties: {
             targetApp: {
               type: Type.STRING,
-              enum: [AppMode.IMAGE, AppMode.CHAT, AppMode.EMAIL, AppMode.HUB],
+              enum: [AppMode.IMAGE, AppMode.CHAT, AppMode.EMAIL, AppMode.HUB, AppMode.WORKFLOWS],
             },
             refinedPrompt: {
               type: Type.STRING,
@@ -84,6 +86,33 @@ export const sendChatMessage = async (
     console.error("Chat error:", error);
     return "Sorry, I encountered an error processing your request.";
   }
+};
+
+// --- Workflow Specific Services ---
+
+export const executeGeminiLogic = async (systemInstruction: string, inputData: string): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Input Data: ${inputData}`,
+      config: {
+        systemInstruction: systemInstruction || "You are a data processor. Analyze the input and provide the requested output.",
+      }
+    });
+    return response.text || "No analysis generated.";
+  } catch (error) {
+    return `Error processing logic: ${error instanceof Error ? error.message : "Unknown"}`;
+  }
+};
+
+export const simulateGithubAction = async (repoName: string, action: string, data: string): Promise<string> => {
+  // Simulating an API call to GitHub
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  return `[GitHub Action Success]
+  Repo: ${repoName}
+  Action: ${action || 'Commit'}
+  Files Updated: 1
+  Data Payload: "${data.substring(0, 50)}..."`;
 };
 
 // --- Image Generation ---
